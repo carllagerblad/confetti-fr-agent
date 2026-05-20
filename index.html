@@ -96,7 +96,7 @@
       meta = `<span class="row-meta">${d}</span>`;
     }
     return `
-      <div class="widget-row">
+      <div class="widget-row" onclick="location.href='ticket.html?id=${t.id}'">
         <span class="ticket-tag status-${t.status}">${statusLabel}</span>
         <span class="row-title">${t.title}</span>
         ${meta}

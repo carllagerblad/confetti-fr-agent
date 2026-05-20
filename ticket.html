@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ärende — FR Agent</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><img src="logo.png" alt="Confetti" height="28"></a>
+    <div class="nav-center">
+      <div class="nav-center-title">FR Agent</div>
+      <div class="nav-center-sub">Feature Request Agent</div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Startsida</a>
+      <a href="nyheter.html" class="nav-link">Nyheter</a>
+      <a href="tickets.html" class="nav-link">Alla ärenden</a>
+      <a href="submit.html" class="nav-btn">+ Ny analys</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main-content">
+  <div class="loading" style="padding: 4rem 2rem; text-align:center;">Laddar ärende…</div>
+</main>
+
+<script>
+  async function getConfig() {
+    const res = await fetch('/api/config');
+    return res.json();
+  }
+
+  async function load() {
+    const id = new URLSearchParams(location.search).get('id');
+    const main = document.getElementById('main-content');
+
+    if (!id) {
+      main.innerHTML = '<div class="empty-state"><p>Inget ärende angivet. <a href="tickets.html">Tillbaka →</a></p></div>';
+      return;
+    }
+
+    let cfg;
+    try { cfg = await getConfig(); } catch {
+      main.innerHTML = '<div class="empty-state"><p>Kunde inte nå servern.</p></div>';
+      return;
+    }
+
+    const res = await fetch(
+      `${cfg.supabaseUrl}/rest/v1/feature_requests?id=eq.${id}&select=*`,
+      { headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': `Bearer ${cfg.supabaseAnonKey}` } }
+    );
+    const data = await res.json();
+    const t = Array.isArray(data) && data[0];
+
+    if (!t) {
+      main.innerHTML = '<div class="empty-state"><p>Ärendet hittades inte. <a href="tickets.html">Tillbaka →</a></p></div>';
+      return;
+    }
+
+    document.title = `${t.title} — FR Agent`;
+
+    const created = new Date(t.created_at).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' });
+    const updated = new Date(t.updated_at).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' });
+    const sources = (t.sources || []).join(', ') || 'Okänd källa';
+    const statusLabel = { new: 'Ny', reviewed: 'Granskad', in_progress: 'Pågående', done: 'Klar' }[t.status] || t.status;
+
+    main.innerHTML = `
+      <header class="page-header">
+        <div class="page-header-inner">
+          <a href="javascript:history.back()" class="back-link">← Tillbaka</a>
+          <div class="detail-meta-row">
+            <span class="ticket-tag status-${t.status}">${statusLabel}</span>
+            <span class="detail-count">${t.request_count} ${t.request_count === 1 ? 'request' : 'requests'}</span>
+          </div>
+          <h1 class="page-title">${t.title}</h1>
+          <div class="detail-dates">
+            <span>Skapad ${created}</span>
+            ${t.updated_at !== t.created_at ? `<span>· Uppdaterad ${updated}</span>` : ''}
+            <span>· ${sources}</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="container">
+        <div class="detail-body">
+
+          <div class="detail-section">
+            <p class="detail-label">Sammanfattning</p>
+            <p class="detail-text">${t.summary}</p>
+          </div>
+
+          <div class="detail-section">
+            <p class="detail-label">Problemet som lyfts</p>
+            <div class="ticket-problem" style="margin-bottom:0;">
+              <p>${t.problem}</p>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <p class="detail-label">Ursprunglig feedback (${(t.raw_feedback || []).length} ${(t.raw_feedback || []).length === 1 ? 'konversation' : 'konversationer'})</p>
+            <div class="feedback-list">
+              ${(t.raw_feedback || []).map((f, i) => `
+                <div class="feedback-item">
+                  <span class="feedback-num">${i + 1}</span>
+                  <p class="feedback-text">${f}</p>
+                </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <p class="detail-label">Status</p>
+            <select class="form-select" id="status-select" style="max-width:220px;">
+              <option value="new" ${t.status==='new'?'selected':''}>Ny</option>
+              <option value="reviewed" ${t.status==='reviewed'?'selected':''}>Granskad</option>
+              <option value="in_progress" ${t.status==='in_progress'?'selected':''}>Pågående</option>
+              <option value="done" ${t.status==='done'?'selected':''}>Klar</option>
+            </select>
+            <p class="status-saved" id="status-saved" style="display:none;">Sparat!</p>
+          </div>
+
+        </div>
+      </div>`;
+
+    document.getElementById('status-select').addEventListener('change', async (e) => {
+      await fetch(`${cfg.supabaseUrl}/rest/v1/feature_requests?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': cfg.supabaseAnonKey,
+          'Authorization': `Bearer ${cfg.supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ status: e.target.value })
+      });
+      const saved = document.getElementById('status-saved');
+      saved.style.display = 'block';
+      setTimeout(() => saved.style.display = 'none', 2000);
+    });
+  }
+
+  load();
+</script>
+</body>
+</html>

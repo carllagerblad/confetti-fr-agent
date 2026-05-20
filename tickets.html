@@ -127,7 +127,7 @@
     const sources = (t.sources || []).join(', ') || 'Okänd källa';
     const statusLabel = { new: 'Ny', reviewed: 'Granskad', in_progress: 'Pågående', done: 'Klar' }[t.status] || t.status;
     return `
-      <article class="ticket-card">
+      <article class="ticket-card" onclick="if(!event.target.closest('select'))location.href='ticket.html?id=${t.id}'">
         <div class="ticket-card-header">
           <span class="ticket-tag status-${t.status}">${statusLabel}</span>
           <span class="ticket-count">${t.request_count} ${t.request_count === 1 ? 'request' : 'requests'}</span>
@@ -141,7 +141,7 @@
         <footer class="ticket-footer">
           <span class="ticket-source">${sources}</span>
           <div style="display:flex;align-items:center;gap:1rem;">
-            <select class="status-select" data-id="${t.id}" style="background:var(--bg);border:1px solid var(--border);color:var(--text-muted);font-family:'EB Garamond',serif;font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.5rem;cursor:pointer;outline:none;">
+            <select class="status-select" data-id="${t.id}" style="background:var(--bg);border:1px solid var(--border);color:var(--text-muted);font-family:'Source Sans 3',sans-serif;font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.5rem;cursor:pointer;outline:none;">
               <option value="new" ${t.status==='new'?'selected':''}>Ny</option>
               <option value="reviewed" ${t.status==='reviewed'?'selected':''}>Granskad</option>
               <option value="in_progress" ${t.status==='in_progress'?'selected':''}>Pågående</option>

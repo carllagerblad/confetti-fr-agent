@@ -559,6 +559,114 @@ body {
   background: rgba(0, 194, 219, 0.08);
 }
 
+/* ── Detail page ── */
+.back-link {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-bottom: 1.2rem;
+  transition: color 0.15s;
+}
+
+.back-link:hover { color: var(--text); }
+
+.detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.detail-dates {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 0.4rem;
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.detail-body {
+  padding: 2.5rem 0;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.detail-section {}
+
+.detail-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 0.6rem;
+}
+
+.detail-text {
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.feedback-item {
+  display: flex;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.1rem 1.25rem;
+}
+
+.feedback-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  min-width: 1.2rem;
+  padding-top: 0.2rem;
+}
+
+.feedback-text {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.status-saved {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cyan);
+  margin-top: 0.5rem;
+}
+
+/* ── Clickable cards ── */
+.ticket-card {
+  cursor: pointer;
+}
+
+.widget-row {
+  cursor: pointer;
+}
+
 /* ── Not-a-feature-request ── */
 .not-fr-card {
   margin-top: 2rem;
