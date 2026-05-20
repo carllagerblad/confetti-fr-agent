@@ -139,14 +139,14 @@
           <p>${t.problem}</p>
         </div>
         <footer class="ticket-footer">
-          <span class="ticket-source">${sources}</span>
+          <select class="status-select" data-id="${t.id}" style="background:var(--bg);border:1px solid var(--border);color:var(--text-muted);font-family:'Source Sans 3',sans-serif;font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.5rem;cursor:pointer;outline:none;">
+            <option value="new" ${t.status==='new'?'selected':''}>Ny</option>
+            <option value="reviewed" ${t.status==='reviewed'?'selected':''}>Granskad</option>
+            <option value="in_progress" ${t.status==='in_progress'?'selected':''}>Pågående</option>
+            <option value="done" ${t.status==='done'?'selected':''}>Klar</option>
+          </select>
           <div style="display:flex;align-items:center;gap:1rem;">
-            <select class="status-select" data-id="${t.id}" style="background:var(--bg);border:1px solid var(--border);color:var(--text-muted);font-family:'Source Sans 3',sans-serif;font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.5rem;cursor:pointer;outline:none;">
-              <option value="new" ${t.status==='new'?'selected':''}>Ny</option>
-              <option value="reviewed" ${t.status==='reviewed'?'selected':''}>Granskad</option>
-              <option value="in_progress" ${t.status==='in_progress'?'selected':''}>Pågående</option>
-              <option value="done" ${t.status==='done'?'selected':''}>Klar</option>
-            </select>
+            <span class="ticket-source">${sources}</span>
             <span class="ticket-date">${date}</span>
           </div>
         </footer>
