@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skicka feedback — FR Agent</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .how-to {
+      padding: 3rem 0;
+    }
+    .how-to-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      max-width: 680px;
+    }
+    .step-list {
+      list-style: none;
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .step {
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+    }
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--lavender);
+      min-width: 1.8rem;
+      line-height: 1.4;
+    }
+    .step-text {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .step-text strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    .tip {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      font-style: italic;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">FR<span>Agent</span></a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Nyheter</a>
+      <a href="tickets.html" class="nav-link">Alla ärenden</a>
+      <a href="submit.html" class="nav-link active">Skicka in</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-header">
+  <div class="page-header-inner">
+    <p class="page-label">Analysera ny feedback</p>
+    <h1 class="page-title">Så här gör du</h1>
+    <p class="page-subtitle">Analysen sker i Claude Code — du klistrar in feedbacken direkt i chatten.</p>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="how-to">
+      <div class="how-to-card">
+        <p class="page-label">Steg för steg</p>
+        <ol class="step-list">
+          <li class="step">
+            <span class="step-num">1</span>
+            <p class="step-text">Öppna <strong>Claude Code</strong> på din dator.</p>
+          </li>
+          <li class="step">
+            <span class="step-num">2</span>
+            <p class="step-text">Klistra in feedbacken och skriv varifrån den kom, till exempel:<br>
+              <strong>"Analysera detta feature request från Intercom: [klistra in text]"</strong>
+            </p>
+          </li>
+          <li class="step">
+            <span class="step-num">3</span>
+            <p class="step-text">Claude analyserar feedbacken, kontrollerar om det redan finns ett liknande ärende, och sparar resultatet i databasen.</p>
+          </li>
+          <li class="step">
+            <span class="step-num">4</span>
+            <p class="step-text">Kom tillbaka hit och ladda om sidan — <strong>ärendet syns direkt</strong> i nyhetsvyn och ärendelistan.</p>
+          </li>
+        </ol>
+
+        <hr class="divider">
+
+        <p class="tip">Tips: Du kan klistra in hela mejltrådar, Intercom-konversationer eller anteckningar från möten. Claude identifierar automatiskt om det är ett feature request eller något annat.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

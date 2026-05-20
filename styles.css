@@ -1,0 +1,507 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+:root {
+  --bg:           #0a130d;
+  --surface:      #111e14;
+  --surface-2:    #182b1d;
+  --border:       #243d2b;
+  --border-light: #2e5036;
+  --text:         #f0ebe0;
+  --text-muted:   #7a9e85;
+  --text-dim:     #4a6b52;
+  --green:        #135029;
+  --green-lit:    #1c6e38;
+  --lavender:     #e7d1ff;
+  --lavender-dim: rgba(231, 209, 255, 0.1);
+  --lavender-border: rgba(231, 209, 255, 0.25);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* ── Navigation ── */
+.nav {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.nav-logo span {
+  color: var(--lavender);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-link {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--text);
+}
+
+.nav-btn {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--green);
+  color: var(--text);
+  text-decoration: none;
+  padding: 0.4rem 1.1rem;
+  border: 1px solid var(--green-lit);
+  transition: background 0.2s;
+}
+
+.nav-btn:hover {
+  background: var(--green-lit);
+}
+
+/* ── Page header ── */
+.page-header {
+  border-bottom: 1px solid var(--border);
+  padding: 3rem 0 2.5rem;
+}
+
+.page-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.page-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lavender);
+  margin-bottom: 0.5rem;
+}
+
+.page-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+}
+
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  max-width: 520px;
+}
+
+/* ── Container ── */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ── Ticket card ── */
+.news-list, .tickets-list {
+  padding: 2.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5px;
+}
+
+.ticket-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.8rem 2rem;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: default;
+}
+
+.ticket-card:hover {
+  border-color: var(--border-light);
+  background: var(--surface-2);
+}
+
+.ticket-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.ticket-tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid;
+}
+
+.status-new {
+  color: var(--lavender);
+  border-color: var(--lavender-border);
+  background: var(--lavender-dim);
+}
+
+.status-reviewed {
+  color: #f0d070;
+  border-color: rgba(240, 208, 112, 0.3);
+  background: rgba(240, 208, 112, 0.08);
+}
+
+.status-in_progress {
+  color: #6fcf8a;
+  border-color: rgba(111, 207, 138, 0.3);
+  background: rgba(111, 207, 138, 0.08);
+}
+
+.status-done {
+  color: var(--text-dim);
+  border-color: var(--border);
+  background: transparent;
+}
+
+.ticket-count {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+.ticket-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.ticket-summary {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.ticket-problem {
+  border-left: 2px solid var(--green);
+  padding-left: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.ticket-problem-label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lavender);
+  margin-bottom: 0.2rem;
+}
+
+.ticket-problem p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+.ticket-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.ticket-source, .ticket-date {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ── Submit form ── */
+.form-section {
+  padding: 3rem 0;
+}
+
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2.5rem;
+  max-width: 760px;
+}
+
+.form-group {
+  margin-bottom: 1.8rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lavender);
+  margin-bottom: 0.6rem;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--border-light);
+}
+
+.form-textarea {
+  min-height: 200px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.form-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a9e85' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.form-select option {
+  background: var(--surface);
+}
+
+.form-btn {
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--green);
+  color: var(--text);
+  border: 1px solid var(--green-lit);
+  padding: 0.75rem 2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.form-btn:hover:not(:disabled) {
+  background: var(--green-lit);
+}
+
+.form-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Result card ── */
+.result-card {
+  margin-top: 2rem;
+  border: 1px solid var(--lavender-border);
+  background: var(--lavender-dim);
+  padding: 1.8rem 2rem;
+  display: none;
+}
+
+.result-card.visible {
+  display: block;
+}
+
+.result-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lavender);
+  margin-bottom: 0.3rem;
+}
+
+.result-value {
+  color: var(--text);
+  margin-bottom: 1.2rem;
+}
+
+.result-value:last-child {
+  margin-bottom: 0;
+}
+
+.result-merged {
+  border-top: 1px solid var(--lavender-border);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Stats bar ── */
+.stats-bar {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+}
+
+.stats-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 3rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 0.2rem;
+}
+
+/* ── Filters ── */
+.filters {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover, .filter-btn.active {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+/* ── States ── */
+.loading, .empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.empty-state a {
+  color: var(--lavender);
+  text-decoration: none;
+}
+
+.empty-state a:hover {
+  text-decoration: underline;
+}
+
+.error-msg {
+  color: #e07070;
+  font-size: 0.9rem;
+  margin-top: 0.8rem;
+  display: none;
+}
+
+.error-msg.visible {
+  display: block;
+}
+
+/* ── Decorative rule ── */
+.rule {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* ── Not-a-feature-request notice ── */
+.not-fr-card {
+  margin-top: 2rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 1.8rem 2rem;
+  display: none;
+}
+
+.not-fr-card.visible {
+  display: block;
+}
+
+.not-fr-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.not-fr-text {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
