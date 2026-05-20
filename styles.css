@@ -758,6 +758,90 @@ body {
 
 .info-select:focus { border-color: var(--cyan); }
 
+/* ── Tag input ── */
+.tag-field {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  transition: border-color 0.15s;
+  padding: 0.4rem 0.5rem 0.3rem;
+}
+
+.tag-field:focus-within { border-color: var(--cyan); }
+
+.tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.tag-chips:empty { margin-bottom: 0; }
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--cyan);
+  color: var(--dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  white-space: nowrap;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: var(--dark);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.tag-remove:hover { opacity: 1; }
+
+.tag-input-wrap { position: relative; }
+
+.tag-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.25rem;
+  outline: none;
+}
+
+.tag-input::placeholder { color: var(--text-dim); }
+
+.tag-suggestions {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.tag-suggestion-item {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.88rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.tag-suggestion-item:hover { background: var(--bg); }
+
 /* ── Clickable cards ── */
 .ticket-card {
   cursor: pointer;

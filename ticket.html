@@ -149,13 +149,19 @@
 
               <div class="info-row">
                 <p class="info-label">Produktområde</p>
-                <input
-                  class="info-input"
-                  id="product-area-input"
-                  type="text"
-                  placeholder="Ej angivet"
-                  value="${t.product_area || ''}"
-                >
+                <div class="tag-field" id="tag-field">
+                  <div class="tag-chips" id="tag-chips"></div>
+                  <div class="tag-input-wrap">
+                    <input
+                      class="tag-input"
+                      id="tag-input"
+                      type="text"
+                      placeholder="Lägg till område…"
+                      autocomplete="off"
+                    >
+                    <div class="tag-suggestions" id="tag-suggestions"></div>
+                  </div>
+                </div>
                 <p class="status-saved" id="area-saved" style="display:none;">Sparat!</p>
               </div>
 
@@ -184,14 +190,93 @@
       showSaved('status-saved');
     });
 
-    let areaTimer;
-    document.getElementById('product-area-input').addEventListener('input', (e) => {
-      clearTimeout(areaTimer);
-      areaTimer = setTimeout(async () => {
-        await patch(cfg, id, { product_area: e.target.value || null });
-        showSaved('area-saved');
-      }, 600);
+    // ── Tag input ──
+    let currentTags = Array.isArray(t.product_areas) ? [...t.product_areas] : [];
+    let allKnownTags = [];
+
+    // Fetch all previously used tags across all feature requests
+    const tagsRes = await fetch(
+      `${cfg.supabaseUrl}/rest/v1/feature_requests?select=product_areas`,
+      { headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': `Bearer ${cfg.supabaseAnonKey}` } }
+    );
+    const tagsData = await tagsRes.json();
+    if (Array.isArray(tagsData)) {
+      const flat = tagsData.flatMap(r => r.product_areas || []);
+      allKnownTags = [...new Set(flat)].sort();
+    }
+
+    function renderChips() {
+      const chips = document.getElementById('tag-chips');
+      chips.innerHTML = currentTags.map(tag => `
+        <span class="tag-chip">
+          ${tag}
+          <button class="tag-remove" data-tag="${tag}" title="Ta bort">×</button>
+        </span>`).join('');
+      chips.querySelectorAll('.tag-remove').forEach(btn => {
+        btn.addEventListener('click', () => removeTag(btn.dataset.tag));
+      });
+    }
+
+    async function saveTags() {
+      await patch(cfg, id, { product_areas: currentTags });
+      showSaved('area-saved');
+    }
+
+    function addTag(value) {
+      const tag = value.trim();
+      if (!tag || currentTags.includes(tag)) return;
+      currentTags.push(tag);
+      renderChips();
+      saveTags();
+      if (!allKnownTags.includes(tag)) allKnownTags.push(tag);
+    }
+
+    function removeTag(tag) {
+      currentTags = currentTags.filter(t => t !== tag);
+      renderChips();
+      saveTags();
+    }
+
+    function renderSuggestions(query) {
+      const sugg = document.getElementById('tag-suggestions');
+      if (!query) { sugg.style.display = 'none'; return; }
+      const matches = allKnownTags.filter(t =>
+        t.toLowerCase().includes(query.toLowerCase()) && !currentTags.includes(t)
+      );
+      if (!matches.length) { sugg.style.display = 'none'; return; }
+      sugg.style.display = 'block';
+      sugg.innerHTML = matches.map(m => `<div class="tag-suggestion-item" data-value="${m}">${m}</div>`).join('');
+      sugg.querySelectorAll('.tag-suggestion-item').forEach(item => {
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          addTag(item.dataset.value);
+          document.getElementById('tag-input').value = '';
+          sugg.style.display = 'none';
+        });
+      });
+    }
+
+    const tagInput = document.getElementById('tag-input');
+
+    tagInput.addEventListener('input', (e) => renderSuggestions(e.target.value));
+
+    tagInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && tagInput.value.trim()) {
+        e.preventDefault();
+        addTag(tagInput.value);
+        tagInput.value = '';
+        document.getElementById('tag-suggestions').style.display = 'none';
+      }
+      if (e.key === 'Escape') {
+        document.getElementById('tag-suggestions').style.display = 'none';
+      }
     });
+
+    tagInput.addEventListener('blur', () => {
+      setTimeout(() => { document.getElementById('tag-suggestions').style.display = 'none'; }, 150);
+    });
+
+    renderChips();
   }
 
   load();
