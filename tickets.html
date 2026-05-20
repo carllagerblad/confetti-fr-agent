@@ -28,139 +28,132 @@
   <div class="page-header-inner">
     <p class="page-label">Ärendehantering</p>
     <h1 class="page-title">Alla ärenden</h1>
-    <p class="page-subtitle">Samtliga identifierade feature requests, sorterade efter antal gånger efterfrågat.</p>
+    <p class="page-subtitle">Dra och släpp kort mellan kolumnerna för att ändra status.</p>
   </div>
 </header>
 
 <main>
-  <div class="container">
-    <div class="filters" id="filters">
-      <button class="filter-btn active" data-status="all">Alla</button>
-      <button class="filter-btn" data-status="new">Nya</button>
-      <button class="filter-btn" data-status="reviewed">Granskade</button>
-      <button class="filter-btn" data-status="in_progress">Pågående</button>
-      <button class="filter-btn" data-status="done">Klara</button>
-    </div>
-
-    <div id="tickets-list" class="tickets-list">
-      <div class="loading">Laddar ärenden…</div>
+  <div class="kanban-wrap">
+    <div class="kanban-board" id="kanban-board">
+      <div class="loading" style="grid-column:1/-1;padding:4rem 2rem;text-align:center;">Laddar ärenden…</div>
     </div>
   </div>
 </main>
 
 <script>
-  let allTickets = [];
-  let activeFilter = 'all';
+  const COLUMNS = [
+    { id: 'new',         label: 'Nya' },
+    { id: 'reviewed',    label: 'Granskade' },
+    { id: 'in_progress', label: 'Pågående' },
+    { id: 'done',        label: 'Klara' }
+  ];
+
+  let cfg, allTickets = [];
 
   async function getConfig() {
     const res = await fetch('/api/config');
     return res.json();
   }
 
-  async function loadTickets() {
-    const list = document.getElementById('tickets-list');
-    let cfg;
-    try {
-      cfg = await getConfig();
-    } catch {
-      list.innerHTML = '<div class="empty-state"><p>Kunde inte nå servern.</p></div>';
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `${cfg.supabaseUrl}/rest/v1/feature_requests?select=*&order=request_count.desc`,
-        { headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': `Bearer ${cfg.supabaseAnonKey}` } }
-      );
-      allTickets = await res.json();
-      renderList();
-    } catch {
-      list.innerHTML = '<div class="empty-state"><p>Kunde inte ladda ärenden.</p></div>';
-    }
+  function headers() {
+    return { 'apikey': cfg.supabaseAnonKey, 'Authorization': `Bearer ${cfg.supabaseAnonKey}` };
   }
 
-  function renderList() {
-    const list = document.getElementById('tickets-list');
-    const filtered = activeFilter === 'all' ? allTickets : allTickets.filter(t => t.status === activeFilter);
-
-    if (filtered.length === 0) {
-      list.innerHTML = '<div class="empty-state"><p>Inga ärenden i den här kategorin. <a href="submit.html">Analysera feedback →</a></p></div>';
-      return;
-    }
-
-    list.innerHTML = filtered.map(renderCard).join('');
-
-    list.querySelectorAll('.status-select').forEach(sel => {
-      sel.addEventListener('change', async (e) => {
-        const id = e.target.dataset.id;
-        const newStatus = e.target.value;
-        await updateStatus(id, newStatus, cfg);
-        const ticket = allTickets.find(t => t.id === id);
-        if (ticket) ticket.status = newStatus;
-        renderList();
-      });
-    });
-  }
-
-  async function updateStatus(id, status, cfg) {
+  async function updateStatus(id, status) {
     await fetch(`${cfg.supabaseUrl}/rest/v1/feature_requests?id=eq.${id}`, {
       method: 'PATCH',
-      headers: {
-        'apikey': cfg.supabaseAnonKey,
-        'Authorization': `Bearer ${cfg.supabaseAnonKey}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
+      headers: { ...headers(), 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status })
     });
   }
 
-  // need cfg in scope for status update
-  let cfg;
-  (async () => {
-    cfg = await getConfig().catch(() => ({}));
-    loadTickets();
-  })();
-
   function renderCard(t) {
-    const date = new Date(t.created_at).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' });
-    const sources = (t.sources || []).join(', ') || 'Okänd källa';
-    const statusLabel = { new: 'Ny', reviewed: 'Granskad', in_progress: 'Pågående', done: 'Klar' }[t.status] || t.status;
+    const date = new Date(t.created_at).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
+    const areas = (t.product_areas || []);
     return `
-      <article class="ticket-card" onclick="if(!event.target.closest('select'))location.href='ticket.html?id=${t.id}'">
-        <div class="ticket-card-header">
-          <div class="card-area-tags">${(t.product_areas || []).map(a => `<span class="area-tag">${a}</span>`).join('')}</div>
-          <span class="ticket-count">${t.request_count} ${t.request_count === 1 ? 'request' : 'requests'}</span>
+      <div class="kanban-card" draggable="true" data-id="${t.id}" data-status="${t.status}" onclick="location.href='ticket.html?id=${t.id}'">
+        ${areas.length ? `<div class="kanban-card-tags">${areas.map(a => `<span class="area-tag">${a}</span>`).join('')}</div>` : ''}
+        <p class="kanban-card-title">${t.title}</p>
+        <div class="kanban-card-footer">
+          <span class="kanban-card-source">${(t.sources || []).join(', ') || '—'}</span>
+          <span class="kanban-card-meta">${t.request_count} req · ${date}</span>
         </div>
-        <h2 class="ticket-title">${t.title}</h2>
-        <p class="ticket-summary">${t.summary}</p>
-        <div class="ticket-problem">
-          <span class="ticket-problem-label">Problemet som lyfts</span>
-          <p>${t.problem}</p>
-        </div>
-        <footer class="ticket-footer">
-          <select class="status-select" data-id="${t.id}" style="background:var(--bg);border:1px solid var(--border);color:var(--text-muted);font-family:'Source Sans 3',sans-serif;font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.5rem;cursor:pointer;outline:none;">
-            <option value="new" ${t.status==='new'?'selected':''}>Ny</option>
-            <option value="reviewed" ${t.status==='reviewed'?'selected':''}>Granskad</option>
-            <option value="in_progress" ${t.status==='in_progress'?'selected':''}>Pågående</option>
-            <option value="done" ${t.status==='done'?'selected':''}>Klar</option>
-          </select>
-          <div style="display:flex;align-items:center;gap:1rem;">
-            <span class="ticket-source">${sources}</span>
-            <span class="ticket-date">${date}</span>
-          </div>
-        </footer>
-      </article>`;
+      </div>`;
   }
 
-  document.getElementById('filters').addEventListener('click', (e) => {
-    const btn = e.target.closest('.filter-btn');
-    if (!btn) return;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter = btn.dataset.status;
-    renderList();
-  });
+  function buildBoard() {
+    const board = document.getElementById('kanban-board');
+    board.innerHTML = COLUMNS.map(col => {
+      const tickets = allTickets.filter(t => t.status === col.id);
+      return `
+        <div class="kanban-column" data-status="${col.id}">
+          <div class="kanban-column-header">
+            <span class="kanban-column-title">${col.label}</span>
+            <span class="kanban-column-count">${tickets.length}</span>
+          </div>
+          <div class="kanban-cards" data-status="${col.id}">
+            ${tickets.map(renderCard).join('')}
+            ${tickets.length === 0 ? '<div class="kanban-empty">Inga ärenden</div>' : ''}
+          </div>
+        </div>`;
+    }).join('');
+
+    initDragDrop();
+  }
+
+  function initDragDrop() {
+    let dragId = null;
+
+    document.querySelectorAll('.kanban-card').forEach(card => {
+      card.addEventListener('dragstart', (e) => {
+        dragId = card.dataset.id;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
+      });
+    });
+
+    document.querySelectorAll('.kanban-cards').forEach(col => {
+      col.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
+        col.classList.add('drag-over');
+      });
+      col.addEventListener('dragleave', (e) => {
+        if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+      });
+      col.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        col.classList.remove('drag-over');
+        const newStatus = col.dataset.status;
+        const ticket = allTickets.find(t => t.id === dragId);
+        if (!ticket || ticket.status === newStatus) return;
+        ticket.status = newStatus;
+        buildBoard();
+        await updateStatus(dragId, newStatus);
+      });
+    });
+  }
+
+  async function load() {
+    try { cfg = await getConfig(); } catch {
+      document.getElementById('kanban-board').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>Kunne inte nå servern.</p></div>';
+      return;
+    }
+    const res = await fetch(
+      `${cfg.supabaseUrl}/rest/v1/feature_requests?select=*&order=created_at.desc`,
+      { headers: headers() }
+    );
+    allTickets = await res.json();
+    if (!Array.isArray(allTickets)) allTickets = [];
+    buildBoard();
+  }
+
+  load();
 </script>
 </body>
 </html>
