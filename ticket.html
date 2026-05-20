@@ -34,6 +34,26 @@
     return res.json();
   }
 
+  async function patch(cfg, id, data) {
+    return fetch(`${cfg.supabaseUrl}/rest/v1/feature_requests?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': cfg.supabaseAnonKey,
+        'Authorization': `Bearer ${cfg.supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(data)
+    });
+  }
+
+  function showSaved(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 2000);
+  }
+
   async function load() {
     const id = new URLSearchParams(location.search).get('id');
     const main = document.getElementById('main-content');
@@ -74,7 +94,6 @@
           <a href="javascript:history.back()" class="back-link">← Tillbaka</a>
           <div class="detail-meta-row">
             <span class="ticket-tag status-${t.status}">${statusLabel}</span>
-            <span class="detail-count">${t.request_count} ${t.request_count === 1 ? 'request' : 'requests'}</span>
           </div>
           <h1 class="page-title">${t.title}</h1>
           <div class="detail-dates">
@@ -86,59 +105,92 @@
       </header>
 
       <div class="container">
-        <div class="detail-body">
+        <div class="detail-layout">
 
-          <div class="detail-section">
-            <p class="detail-label">Sammanfattning</p>
-            <p class="detail-text">${t.summary}</p>
-          </div>
+          <!-- Huvudinnehåll -->
+          <div class="detail-main">
 
-          <div class="detail-section">
-            <p class="detail-label">Problemet som lyfts</p>
-            <div class="ticket-problem" style="margin-bottom:0;">
-              <p>${t.problem}</p>
+            <div class="detail-section">
+              <p class="detail-label">Sammanfattning</p>
+              <p class="detail-text">${t.summary}</p>
             </div>
-          </div>
 
-          <div class="detail-section">
-            <p class="detail-label">Ursprunglig feedback (${(t.raw_feedback || []).length} ${(t.raw_feedback || []).length === 1 ? 'konversation' : 'konversationer'})</p>
-            <div class="feedback-list">
-              ${(t.raw_feedback || []).map((f, i) => `
-                <div class="feedback-item">
-                  <span class="feedback-num">${i + 1}</span>
-                  <p class="feedback-text">${f}</p>
-                </div>`).join('')}
+            <div class="detail-section">
+              <p class="detail-label">Problemet som lyfts</p>
+              <div class="ticket-problem" style="margin-bottom:0;">
+                <p>${t.problem}</p>
+              </div>
             </div>
+
+            <div class="detail-section">
+              <p class="detail-label">Ursprunglig feedback (${(t.raw_feedback || []).length} ${(t.raw_feedback || []).length === 1 ? 'konversation' : 'konversationer'})</p>
+              <div class="feedback-list">
+                ${(t.raw_feedback || []).map((f, i) => `
+                  <div class="feedback-item">
+                    <span class="feedback-num">${i + 1}</span>
+                    <p class="feedback-text">${f}</p>
+                  </div>`).join('')}
+              </div>
+            </div>
+
           </div>
 
-          <div class="detail-section">
-            <p class="detail-label">Status</p>
-            <select class="form-select" id="status-select" style="max-width:220px;">
-              <option value="new" ${t.status==='new'?'selected':''}>Ny</option>
-              <option value="reviewed" ${t.status==='reviewed'?'selected':''}>Granskad</option>
-              <option value="in_progress" ${t.status==='in_progress'?'selected':''}>Pågående</option>
-              <option value="done" ${t.status==='done'?'selected':''}>Klar</option>
-            </select>
-            <p class="status-saved" id="status-saved" style="display:none;">Sparat!</p>
-          </div>
+          <!-- Info-ruta -->
+          <aside class="detail-sidebar">
+
+            <div class="info-box">
+
+              <div class="info-row">
+                <p class="info-label">Efterfrågat</p>
+                <p class="info-value info-count">${t.request_count} <span>${t.request_count === 1 ? 'gång' : 'gånger'}</span></p>
+              </div>
+
+              <div class="info-divider"></div>
+
+              <div class="info-row">
+                <p class="info-label">Produktområde</p>
+                <input
+                  class="info-input"
+                  id="product-area-input"
+                  type="text"
+                  placeholder="Ej angivet"
+                  value="${t.product_area || ''}"
+                >
+                <p class="status-saved" id="area-saved" style="display:none;">Sparat!</p>
+              </div>
+
+              <div class="info-divider"></div>
+
+              <div class="info-row">
+                <p class="info-label">Status</p>
+                <select class="info-select" id="status-select">
+                  <option value="new" ${t.status==='new'?'selected':''}>Ny</option>
+                  <option value="reviewed" ${t.status==='reviewed'?'selected':''}>Granskad</option>
+                  <option value="in_progress" ${t.status==='in_progress'?'selected':''}>Pågående</option>
+                  <option value="done" ${t.status==='done'?'selected':''}>Klar</option>
+                </select>
+                <p class="status-saved" id="status-saved" style="display:none;">Sparat!</p>
+              </div>
+
+            </div>
+
+          </aside>
 
         </div>
       </div>`;
 
     document.getElementById('status-select').addEventListener('change', async (e) => {
-      await fetch(`${cfg.supabaseUrl}/rest/v1/feature_requests?id=eq.${id}`, {
-        method: 'PATCH',
-        headers: {
-          'apikey': cfg.supabaseAnonKey,
-          'Authorization': `Bearer ${cfg.supabaseAnonKey}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ status: e.target.value })
-      });
-      const saved = document.getElementById('status-saved');
-      saved.style.display = 'block';
-      setTimeout(() => saved.style.display = 'none', 2000);
+      await patch(cfg, id, { status: e.target.value });
+      showSaved('status-saved');
+    });
+
+    let areaTimer;
+    document.getElementById('product-area-input').addEventListener('input', (e) => {
+      clearTimeout(areaTimer);
+      areaTimer = setTimeout(async () => {
+        await patch(cfg, id, { product_area: e.target.value || null });
+        showSaved('area-saved');
+      }, 600);
     });
   }
 

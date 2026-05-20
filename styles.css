@@ -658,6 +658,106 @@ body {
   margin-top: 0.5rem;
 }
 
+/* ── Detail layout ── */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 2.5rem;
+  padding: 2.5rem 0;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .detail-layout { grid-template-columns: 1fr; }
+  .detail-sidebar { order: -1; }
+}
+
+.detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Info box ── */
+.info-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: sticky;
+  top: 80px;
+}
+
+.info-row {
+  padding: 1.1rem 1.25rem;
+}
+
+.info-divider {
+  border-top: 1px solid var(--border);
+}
+
+.info-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.info-count {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cyan);
+  line-height: 1;
+}
+
+.info-count span {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.info-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.info-input:focus { border-color: var(--cyan); }
+.info-input::placeholder { color: var(--text-dim); }
+
+.info-select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2301444D' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-color: var(--bg);
+  padding-right: 2rem;
+  transition: border-color 0.15s;
+}
+
+.info-select:focus { border-color: var(--cyan); }
+
 /* ── Clickable cards ── */
 .ticket-card {
   cursor: pointer;
