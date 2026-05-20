@@ -772,10 +772,10 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  margin-bottom: 0.35rem;
+  margin-top: 0.35rem;
 }
 
-.tag-chips:empty { margin-bottom: 0; }
+.tag-chips:empty { margin-top: 0; }
 
 .tag-chip {
   display: inline-flex;

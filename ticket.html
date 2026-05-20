@@ -150,7 +150,6 @@
               <div class="info-row">
                 <p class="info-label">Produktområde</p>
                 <div class="tag-field" id="tag-field">
-                  <div class="tag-chips" id="tag-chips"></div>
                   <div class="tag-input-wrap">
                     <input
                       class="tag-input"
@@ -161,6 +160,7 @@
                     >
                     <div class="tag-suggestions" id="tag-suggestions"></div>
                   </div>
+                  <div class="tag-chips" id="tag-chips"></div>
                 </div>
                 <p class="status-saved" id="area-saved" style="display:none;">Sparat!</p>
               </div>
@@ -239,9 +239,8 @@
 
     function renderSuggestions(query) {
       const sugg = document.getElementById('tag-suggestions');
-      if (!query) { sugg.style.display = 'none'; return; }
       const matches = allKnownTags.filter(t =>
-        t.toLowerCase().includes(query.toLowerCase()) && !currentTags.includes(t)
+        (!query || t.toLowerCase().includes(query.toLowerCase())) && !currentTags.includes(t)
       );
       if (!matches.length) { sugg.style.display = 'none'; return; }
       sugg.style.display = 'block';
@@ -258,6 +257,7 @@
 
     const tagInput = document.getElementById('tag-input');
 
+    tagInput.addEventListener('focus', () => renderSuggestions(tagInput.value));
     tagInput.addEventListener('input', (e) => renderSuggestions(e.target.value));
 
     tagInput.addEventListener('keydown', (e) => {
