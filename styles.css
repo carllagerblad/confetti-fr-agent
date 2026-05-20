@@ -1,19 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
 
 :root {
-  --bg:           #0a130d;
-  --surface:      #111e14;
-  --surface-2:    #182b1d;
-  --border:       #243d2b;
-  --border-light: #2e5036;
-  --text:         #f0ebe0;
-  --text-muted:   #7a9e85;
-  --text-dim:     #4a6b52;
+  --bg:           #f5f0e8;
+  --surface:      #ffffff;
+  --surface-2:    #ede8df;
+  --border:       #d4ccbe;
+  --border-light: #b8b0a0;
+  --text:         #1a2e20;
+  --text-muted:   #4a6b52;
+  --text-dim:     #8a9e8e;
   --green:        #135029;
   --green-lit:    #1c6e38;
-  --lavender:     #e7d1ff;
-  --lavender-dim: rgba(231, 209, 255, 0.1);
-  --lavender-border: rgba(231, 209, 255, 0.25);
+  --lavender:     #7c4db8;
+  --lavender-dim: rgba(135, 80, 200, 0.08);
+  --lavender-border: rgba(135, 80, 200, 0.25);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -183,15 +183,15 @@ body {
 }
 
 .status-reviewed {
-  color: #f0d070;
-  border-color: rgba(240, 208, 112, 0.3);
-  background: rgba(240, 208, 112, 0.08);
+  color: #7a6000;
+  border-color: rgba(180, 140, 0, 0.3);
+  background: rgba(240, 208, 112, 0.2);
 }
 
 .status-in_progress {
-  color: #6fcf8a;
-  border-color: rgba(111, 207, 138, 0.3);
-  background: rgba(111, 207, 138, 0.08);
+  color: var(--green);
+  border-color: rgba(19, 80, 41, 0.3);
+  background: rgba(19, 80, 41, 0.08);
 }
 
 .status-done {
@@ -288,7 +288,7 @@ body {
 
 .form-input, .form-select, .form-textarea {
   width: 100%;
-  background: var(--bg);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   font-family: 'EB Garamond', serif;
@@ -311,7 +311,7 @@ body {
 
 .form-select {
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a9e85' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234a6b52' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   padding-right: 2.5rem;
@@ -464,7 +464,7 @@ body {
 }
 
 .error-msg {
-  color: #e07070;
+  color: #b03030;
   font-size: 0.9rem;
   margin-top: 0.8rem;
   display: none;
