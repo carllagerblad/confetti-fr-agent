@@ -75,10 +75,9 @@
     const sources = (t.sources || []).join(', ') || 'Okänd källa';
     const isUpdated = t.updated_at !== t.created_at;
     return `
-      <article class="ticket-card" onclick="location.href='ticket.html?id=${t.id}'"">
+      <article class="ticket-card" onclick="location.href='ticket.html?id=${t.id}'">
         <div class="ticket-card-header">
-          <span class="ticket-tag status-${t.status}">${statusLabel}</span>
-          ${isUpdated && t.request_count > 1 ? `<span class="ticket-tag status-updated">+${t.request_count} requests</span>` : ''}
+          <div class="card-area-tags">${(t.product_areas || []).map(a => `<span class="area-tag">${a}</span>`).join('')}</div>
           <span class="ticket-count">${t.request_count} ${t.request_count === 1 ? 'request' : 'requests'}</span>
         </div>
         <h2 class="ticket-title">${t.title}</h2>

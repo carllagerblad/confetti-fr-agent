@@ -257,6 +257,24 @@ body {
   background: transparent;
 }
 
+.card-area-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.area-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  background: rgba(0, 194, 219, 0.1);
+  color: #006f7d;
+  border: 1px solid rgba(0, 194, 219, 0.35);
+}
+
 .ticket-count {
   font-size: 0.75rem;
   font-weight: 600;

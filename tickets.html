@@ -129,7 +129,7 @@
     return `
       <article class="ticket-card" onclick="if(!event.target.closest('select'))location.href='ticket.html?id=${t.id}'">
         <div class="ticket-card-header">
-          <span class="ticket-tag status-${t.status}">${statusLabel}</span>
+          <div class="card-area-tags">${(t.product_areas || []).map(a => `<span class="area-tag">${a}</span>`).join('')}</div>
           <span class="ticket-count">${t.request_count} ${t.request_count === 1 ? 'request' : 'requests'}</span>
         </div>
         <h2 class="ticket-title">${t.title}</h2>
