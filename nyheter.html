@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nyheter — FR Agent</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><img src="logo.png" alt="Confetti" height="28"></a>
+    <div class="nav-center">
+      <div class="nav-center-title">FR Agent</div>
+      <div class="nav-center-sub">Feature Request Agent</div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Startsida</a>
+      <a href="nyheter.html" class="nav-link active">Nyheter</a>
+      <a href="tickets.html" class="nav-link">Alla ärenden</a>
+      <a href="submit.html" class="nav-btn">+ Ny analys</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-header">
+  <div class="page-header-inner">
+    <p class="page-label">Senaste aktivitet</p>
+    <h1 class="page-title">Nyheter</h1>
+    <p class="page-subtitle">Senast uppdaterade, nyligen tillagda och feature requests med ökande antal.</p>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div id="news-list" class="news-list">
+      <div class="loading">Laddar…</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  async function getConfig() {
+    const res = await fetch('/api/config');
+    return res.json();
+  }
+
+  async function loadNews() {
+    const list = document.getElementById('news-list');
+    let cfg;
+    try { cfg = await getConfig(); } catch {
+      list.innerHTML = '<div class="empty-state"><p>Kunde inte nå servern.</p></div>';
+      return;
+    }
+    try {
+      const res = await fetch(
+        `${cfg.supabaseUrl}/rest/v1/feature_requests?select=*&order=updated_at.desc&limit=5`,
+        { headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': `Bearer ${cfg.supabaseAnonKey}` } }
+      );
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        list.innerHTML = '<div class="empty-state"><p>Inga feature requests ännu. <a href="submit.html">Analysera din första feedback →</a></p></div>';
+        return;
+      }
+      list.innerHTML = data.map(renderCard).join('');
+    } catch {
+      list.innerHTML = '<div class="empty-state"><p>Kunde inte ladda data.</p></div>';
+    }
+  }
+
+  function renderCard(t) {
+    const date = new Date(t.updated_at).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' });
+    const statusLabel = { new: 'Ny', reviewed: 'Granskad', in_progress: 'Pågående', done: 'Klar' }[t.status] || t.status;
+    const sources = (t.sources || []).join(', ') || 'Okänd källa';
+    const isUpdated = t.updated_at !== t.created_at;
+    return `
+      <article class="ticket-card">
+        <div class="ticket-card-header">
+          <span class="ticket-tag status-${t.status}">${statusLabel}</span>
+          ${isUpdated && t.request_count > 1 ? `<span class="ticket-tag status-updated">+${t.request_count} requests</span>` : ''}
+          <span class="ticket-count">${t.request_count} ${t.request_count === 1 ? 'request' : 'requests'}</span>
+        </div>
+        <h2 class="ticket-title">${t.title}</h2>
+        <p class="ticket-summary">${t.summary}</p>
+        <div class="ticket-problem">
+          <span class="ticket-problem-label">Problemet som lyfts</span>
+          <p>${t.problem}</p>
+        </div>
+        <footer class="ticket-footer">
+          <span class="ticket-source">${sources}</span>
+          <span class="ticket-date">Uppdaterad ${date}</span>
+        </footer>
+      </article>`;
+  }
+
+  loadNews();
+</script>
+</body>
+</html>

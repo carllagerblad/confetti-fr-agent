@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FR Agent — Confetti</title>
+  <title>Startsida — FR Agent</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,42 +16,59 @@
       <div class="nav-center-sub">Feature Request Agent</div>
     </div>
     <div class="nav-links">
-      <a href="index.html" class="nav-link active">Nyheter</a>
+      <a href="index.html" class="nav-link active">Startsida</a>
+      <a href="nyheter.html" class="nav-link">Nyheter</a>
       <a href="tickets.html" class="nav-link">Alla ärenden</a>
       <a href="submit.html" class="nav-btn">+ Ny analys</a>
     </div>
   </div>
 </nav>
 
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div class="stat">
-      <span class="stat-value" id="stat-total">—</span>
-      <span class="stat-label">Feature requests totalt</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value" id="stat-new">—</span>
-      <span class="stat-label">Nya denna vecka</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value" id="stat-top">—</span>
-      <span class="stat-label">Mest efterfrågat</span>
-    </div>
-  </div>
-</div>
-
 <header class="page-header">
   <div class="page-header-inner">
-    <p class="page-label">Senaste aktivitet</p>
-    <h1 class="page-title">Nyhetsvy</h1>
-    <p class="page-subtitle">De fem senaste identifierade feature requests från Confettis användare.</p>
+    <p class="page-label">Översikt</p>
+    <h1 class="page-title">Startsida</h1>
+    <p class="page-subtitle">En samlad bild av feature requests från Confettis användare.</p>
   </div>
 </header>
 
 <main>
   <div class="container">
-    <div id="news-list" class="news-list">
-      <div class="loading">Laddar feature requests…</div>
+    <div class="dashboard-grid">
+
+      <!-- Widget: Nyheter -->
+      <section class="widget">
+        <div class="widget-header">
+          <h2 class="widget-title">Nyheter</h2>
+          <a href="nyheter.html" class="widget-link">Visa alla →</a>
+        </div>
+        <div id="widget-news" class="widget-list">
+          <div class="loading">Laddar…</div>
+        </div>
+      </section>
+
+      <!-- Widget: Mest efterfrågade -->
+      <section class="widget">
+        <div class="widget-header">
+          <h2 class="widget-title">Mest efterfrågade</h2>
+          <a href="tickets.html" class="widget-link">Visa alla →</a>
+        </div>
+        <div id="widget-top" class="widget-list">
+          <div class="loading">Laddar…</div>
+        </div>
+      </section>
+
+      <!-- Widget: Senaste nya requests -->
+      <section class="widget">
+        <div class="widget-header">
+          <h2 class="widget-title">Senaste nya</h2>
+          <a href="tickets.html" class="widget-link">Visa alla →</a>
+        </div>
+        <div id="widget-latest" class="widget-list">
+          <div class="loading">Laddar…</div>
+        </div>
+      </section>
+
     </div>
   </div>
 </main>
@@ -62,76 +79,63 @@
     return res.json();
   }
 
-  async function loadNews() {
-    const list = document.getElementById('news-list');
-    let cfg;
-    try {
-      cfg = await getConfig();
-    } catch {
-      list.innerHTML = '<div class="empty-state"><p>Kunde inte nå servern. Är projektet driftsatt?</p></div>';
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `${cfg.supabaseUrl}/rest/v1/feature_requests?select=*&order=created_at.desc&limit=5`,
-        { headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': `Bearer ${cfg.supabaseAnonKey}` } }
-      );
-      const data = await res.json();
-
-      if (!Array.isArray(data) || data.length === 0) {
-        list.innerHTML = '<div class="empty-state"><p>Inga feature requests ännu. <a href="submit.html">Analysera din första feedback →</a></p></div>';
-        return;
-      }
-
-      list.innerHTML = data.map(renderCard).join('');
-      loadStats(cfg);
-    } catch {
-      list.innerHTML = '<div class="empty-state"><p>Kunde inte ladda data från databasen.</p></div>';
-    }
+  function headers(cfg) {
+    return { 'apikey': cfg.supabaseAnonKey, 'Authorization': `Bearer ${cfg.supabaseAnonKey}` };
   }
 
-  async function loadStats(cfg) {
-    const res = await fetch(
-      `${cfg.supabaseUrl}/rest/v1/feature_requests?select=id,request_count,created_at`,
-      { headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': `Bearer ${cfg.supabaseAnonKey}` } }
-    );
-    const data = await res.json();
-    if (!Array.isArray(data)) return;
-
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const newThisWeek = data.filter(d => new Date(d.created_at) > oneWeekAgo).length;
-    const topCount = data.reduce((max, d) => Math.max(max, d.request_count || 1), 1);
-
-    document.getElementById('stat-total').textContent = data.length;
-    document.getElementById('stat-new').textContent = newThisWeek;
-    document.getElementById('stat-top').textContent = topCount + 'x';
-  }
-
-  function renderCard(t) {
-    const date = new Date(t.created_at).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' });
+  function renderRow(t, metaType) {
     const statusLabel = { new: 'Ny', reviewed: 'Granskad', in_progress: 'Pågående', done: 'Klar' }[t.status] || t.status;
-    const sources = (t.sources || []).join(', ') || 'Okänd källa';
+    let meta = '';
+    if (metaType === 'count') {
+      meta = `<span class="row-meta">${t.request_count} req</span>`;
+    } else if (metaType === 'updated') {
+      const d = new Date(t.updated_at).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
+      meta = `<span class="row-meta">${d}</span>`;
+    } else if (metaType === 'created') {
+      const d = new Date(t.created_at).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
+      meta = `<span class="row-meta">${d}</span>`;
+    }
     return `
-      <article class="ticket-card">
-        <div class="ticket-card-header">
-          <span class="ticket-tag status-${t.status}">${statusLabel}</span>
-          <span class="ticket-count">${t.request_count} ${t.request_count === 1 ? 'request' : 'requests'}</span>
-        </div>
-        <h2 class="ticket-title">${t.title}</h2>
-        <p class="ticket-summary">${t.summary}</p>
-        <div class="ticket-problem">
-          <span class="ticket-problem-label">Problemet som lyfts</span>
-          <p>${t.problem}</p>
-        </div>
-        <footer class="ticket-footer">
-          <span class="ticket-source">${sources}</span>
-          <span class="ticket-date">${date}</span>
-        </footer>
-      </article>`;
+      <div class="widget-row">
+        <span class="ticket-tag status-${t.status}">${statusLabel}</span>
+        <span class="row-title">${t.title}</span>
+        ${meta}
+      </div>`;
   }
 
-  loadNews();
+  async function loadAll() {
+    let cfg;
+    try { cfg = await getConfig(); } catch { return; }
+
+    const base = `${cfg.supabaseUrl}/rest/v1/feature_requests`;
+    const h = headers(cfg);
+
+    const [newsRes, topRes, latestRes] = await Promise.all([
+      fetch(`${base}?select=*&order=updated_at.desc&limit=5`, { headers: h }),
+      fetch(`${base}?select=*&order=request_count.desc&limit=5`, { headers: h }),
+      fetch(`${base}?select=*&status=eq.new&order=created_at.desc&limit=5`, { headers: h })
+    ]);
+
+    const [news, top, latest] = await Promise.all([newsRes.json(), topRes.json(), latestRes.json()]);
+
+    const newsEl = document.getElementById('widget-news');
+    const topEl = document.getElementById('widget-top');
+    const latestEl = document.getElementById('widget-latest');
+
+    newsEl.innerHTML = Array.isArray(news) && news.length
+      ? news.map(t => renderRow(t, 'updated')).join('')
+      : '<div class="empty-state"><p>Inget ännu.</p></div>';
+
+    topEl.innerHTML = Array.isArray(top) && top.length
+      ? top.map(t => renderRow(t, 'count')).join('')
+      : '<div class="empty-state"><p>Inget ännu.</p></div>';
+
+    latestEl.innerHTML = Array.isArray(latest) && latest.length
+      ? latest.map(t => renderRow(t, 'created')).join('')
+      : '<div class="empty-state"><p>Inga nya ärenden.</p></div>';
+  }
+
+  loadAll();
 </script>
 </body>
 </html>
